@@ -1,28 +1,9 @@
-REM   Script: 250521 create table and data
-REM   250521 create table and data
+REM   Script: create Isekai guild objects and data
 
-REM   Script: 250517 create table and data
-
-
-REM   250517 create table and data
-
-
-REM   Script: 250502 create table and data
-
-
-REM   250502 create table and data
-
-
-REM   Script: 250420 create table & data
-
-
-REM   250420 create table & data
-
-
-create table 魔物タイプの書 (
+CREATE TABLE 魔物タイプの書 (
     魔物タイプID	NUMBER,
     魔物タイプ名	VARCHAR2(100),
-    CONSTRAINT 魔物タイプの書pk PRIMARY KEY (魔物タイプID)
+    CONSTRAINT 魔物タイプの書PK PRIMARY KEY (魔物タイプID)
 );
 
 insert into 魔物タイプの書 values (1,'亜人');
@@ -45,7 +26,7 @@ insert into 魔物タイプの書 values (9,'鳥類');
 
 insert into 魔物タイプの書 values (10,'ゴーレム');
 
-create table 魔物の書 (
+CREATE TABLE 魔物の書 (
     魔物ID NUMBER,
     名前 VARCHAR2(100) NOT NULL,
     攻撃力	NUMBER,
@@ -54,8 +35,8 @@ create table 魔物の書 (
     最大MP NUMBER,
     魔物タイプID NUMBER,
     登録日 DATE NOT NULL,
-    constraint 魔物の書pk PRIMARY KEY (魔物ID),
-    constraint 魔物の書fk1 foreign key (魔物タイプID) references 魔物タイプの書(魔物タイプID)
+    CONSTRAINT 魔物の書PK PRIMARY KEY (魔物ID),
+    CONSTRAINT 魔物の書FK1 FOREIGN KEY (魔物タイプID) REFERENCES 魔物タイプの書(魔物タイプID)
 );
 
 insert into 魔物の書 values (2,'スライム',5,2,30,20,2,TO_DATE('1925/2/15', 'YYYY-MM-DD'));
@@ -158,7 +139,7 @@ insert into 魔物の書 values (47,'金鬼',35,24,195,18,7,TO_DATE('1970/11/5',
 
 insert into 魔物の書 values (50,'虚空の覇王',200,150,2500,500,NULL,TO_DATE('2023/6/20', 'YYYY-MM-DD'));
 
--- UPDATE 魔物の書 SET 最大MP = NULL WHERE 魔物ID in (8, 18, 28, 38, 48);
+CREATE SEQUENCE SEQ_魔物ID START WITH 51 INCREMENT BY 1;
 
 CREATE TABLE 職業の書 (
     職業ID NUMBER,    -- 職業の一意識別子
@@ -193,10 +174,10 @@ CREATE TABLE 冒険者の書 (
     職業ID NUMBER NOT NULL,            -- 冒険者の職業ID（外部キー）
     レベル NUMBER CHECK (レベル > 0) ,  -- レベル（1以上）
     攻撃力 NUMBER CHECK (攻撃力 >= 0) ,  -- 攻撃力（0以上）
-    守備力 NUMBER CHECK (守備力 >= 0),  -- 守備力（0以上）
+    防御力 NUMBER CHECK (防御力 >= 0),  -- 防御力 （0以上）
     最大HP NUMBER CHECK (最大HP > 0) ,   -- 最大HP（1以上）
     最大MP NUMBER CHECK (最大MP >= 0) ,   -- 最大MP（0以上）
-   コードネーム VARCHAR2(50),  -- コードネーム (NULL許容)
+    コードネーム VARCHAR2(50),  -- コードネーム (NULL許容)
     識別コード CHAR(11),	-- 性別1桁+生年月日8桁+種族コード2桁
     登録日 DATE DEFAULT SYSDATE NOT NULL,        -- 登録日（デフォルトで現在の日付）
     CONSTRAINT 冒険者の書PK PRIMARY KEY (冒険者ID),
@@ -503,7 +484,7 @@ CREATE TABLE ギルド買取依頼の書 (
     受付終了日 DATE,                      -- 依頼の受付終了日
     報酬倍率 DECIMAL(3, 2) DEFAULT 1.0,   -- 通常報酬の倍率（1.0 = 通常）
 	CONSTRAINT ギルド買取依頼の書PK PRIMARY KEY (依頼ID),
-    FOREIGN KEY (魔物ID) REFERENCES 魔物の書(魔物ID)
+    CONSTRAINT ギルド買取依頼の書FK1 FOREIGN KEY (魔物ID) REFERENCES 魔物の書(魔物ID)
 );
 
 CREATE SEQUENCE SEQ_ギルド買取依頼ID START WITH 1 INCREMENT BY 1;
@@ -535,94 +516,66 @@ CREATE TABLE 討伐実績の書 (
     討伐日 DATE,                        -- 討伐が行われた日付
     討伐数 NUMBER DEFAULT 1,                 -- 討伐した魔物の数（デフォルトは1）
     CONSTRAINT 討伐実績の書PK PRIMARY KEY (記録ID),
-    FOREIGN KEY (冒険者ID) REFERENCES 冒険者の書(冒険者ID),
-    FOREIGN KEY (魔物ID) REFERENCES 魔物の書(魔物ID),
-    FOREIGN KEY (エリアID) REFERENCES エリアの書(エリアID)
+    CONSTRAINT 討伐実績の書FK1 FOREIGN KEY (冒険者ID) REFERENCES 冒険者の書(冒険者ID),
+    CONSTRAINT 討伐実績の書FK2 FOREIGN KEY (魔物ID) REFERENCES 魔物の書(魔物ID),
+    CONSTRAINT 討伐実績の書FK3 FOREIGN KEY (エリアID) REFERENCES エリアの書(エリアID)
 );
 
-INSERT INTO 討伐実績の書 VALUES
-(1001, 101, 1, 2, TO_DATE('2025-04-02', 'YYYY-MM-DD'), 10);
+INSERT INTO 討伐実績の書 VALUES (1001, 101, 1, 2, TO_DATE('2025-04-02', 'YYYY-MM-DD'), 10);
 
-INSERT INTO 討伐実績の書 VALUES
-(1002, 101, 2, 1, TO_DATE('2025-04-05', 'YYYY-MM-DD'), 7);
+INSERT INTO 討伐実績の書 VALUES (1002, 101, 2, 1, TO_DATE('2025-04-05', 'YYYY-MM-DD'), 7);
 
-INSERT INTO 討伐実績の書 VALUES
-(1003, 101, 5, 3, TO_DATE('2025-04-10', 'YYYY-MM-DD'), 13);
+INSERT INTO 討伐実績の書 VALUES (1003, 101, 5, 3, TO_DATE('2025-04-10', 'YYYY-MM-DD'), 13);
 
-INSERT INTO 討伐実績の書 VALUES
-(1004, 101, 1, 2, TO_DATE('2025-04-15', 'YYYY-MM-DD'), 9);
+INSERT INTO 討伐実績の書 VALUES (1004, 101, 1, 2, TO_DATE('2025-04-15', 'YYYY-MM-DD'), 9);
 
-INSERT INTO 討伐実績の書 VALUES
-(1005, 101, 3, 1, TO_DATE('2025-04-22', 'YYYY-MM-DD'), 12);
+INSERT INTO 討伐実績の書 VALUES (1005, 101, 3, 1, TO_DATE('2025-04-22', 'YYYY-MM-DD'), 12);
 
-INSERT INTO 討伐実績の書 VALUES
-(1006, 101, 6, 4, TO_DATE('2025-04-28', 'YYYY-MM-DD'), 8);
+INSERT INTO 討伐実績の書 VALUES (1006, 101, 6, 4, TO_DATE('2025-04-28', 'YYYY-MM-DD'), 8);
 
-INSERT INTO 討伐実績の書 VALUES
-(1007, 102, 2, 3, TO_DATE('2025-04-01', 'YYYY-MM-DD'), 5);
+INSERT INTO 討伐実績の書 VALUES (1007, 102, 2, 3, TO_DATE('2025-04-01', 'YYYY-MM-DD'), 5);
 
-INSERT INTO 討伐実績の書 VALUES
-(1008, 102, 3, 2, TO_DATE('2025-04-06', 'YYYY-MM-DD'), 11);
+INSERT INTO 討伐実績の書 VALUES (1008, 102, 3, 2, TO_DATE('2025-04-06', 'YYYY-MM-DD'), 11);
 
-INSERT INTO 討伐実績の書 VALUES
-(1009, 102, 4, 3, TO_DATE('2025-04-11', 'YYYY-MM-DD'), 6);
+INSERT INTO 討伐実績の書 VALUES (1009, 102, 4, 3, TO_DATE('2025-04-11', 'YYYY-MM-DD'), 6);
 
-INSERT INTO 討伐実績の書 VALUES
-(1010, 102, 5, 2, TO_DATE('2025-04-17', 'YYYY-MM-DD'), 9);
+INSERT INTO 討伐実績の書 VALUES (1010, 102, 5, 2, TO_DATE('2025-04-17', 'YYYY-MM-DD'), 9);
 
-INSERT INTO 討伐実績の書 VALUES
-(1011, 102, 6, 5, TO_DATE('2025-04-24', 'YYYY-MM-DD'), 14);
+INSERT INTO 討伐実績の書 VALUES (1011, 102, 6, 5, TO_DATE('2025-04-24', 'YYYY-MM-DD'), 14);
 
-INSERT INTO 討伐実績の書 VALUES
-(1012, 102, 7, 1, TO_DATE('2025-05-02', 'YYYY-MM-DD'), 10);
+INSERT INTO 討伐実績の書 VALUES (1012, 102, 7, 1, TO_DATE('2025-05-02', 'YYYY-MM-DD'), 10);
 
-INSERT INTO 討伐実績の書 VALUES
-(1013, 102, 1, 1, TO_DATE('2025-05-08', 'YYYY-MM-DD'), 8);
+INSERT INTO 討伐実績の書 VALUES (1013, 102, 1, 1, TO_DATE('2025-05-08', 'YYYY-MM-DD'), 8);
 
-INSERT INTO 討伐実績の書 VALUES
-(1014, 103, 1, 2, TO_DATE('2025-04-03', 'YYYY-MM-DD'), 6);
+INSERT INTO 討伐実績の書 VALUES (1014, 103, 1, 2, TO_DATE('2025-04-03', 'YYYY-MM-DD'), 6);
 
-INSERT INTO 討伐実績の書 VALUES
-(1015, 103, 3, 4, TO_DATE('2025-04-08', 'YYYY-MM-DD'), 15);
+INSERT INTO 討伐実績の書 VALUES (1015, 103, 3, 4, TO_DATE('2025-04-08', 'YYYY-MM-DD'), 15);
 
-INSERT INTO 討伐実績の書 VALUES
-(1016, 103, 4, 2, TO_DATE('2025-04-12', 'YYYY-MM-DD'), 10);
+INSERT INTO 討伐実績の書 VALUES (1016, 103, 4, 2, TO_DATE('2025-04-12', 'YYYY-MM-DD'), 10);
 
-INSERT INTO 討伐実績の書 VALUES
-(1017, 103, 5, 5, TO_DATE('2025-04-20', 'YYYY-MM-DD'), 9);
+INSERT INTO 討伐実績の書 VALUES (1017, 103, 5, 5, TO_DATE('2025-04-20', 'YYYY-MM-DD'), 9);
 
-INSERT INTO 討伐実績の書 VALUES
-(1018, 103, 7, 3, TO_DATE('2025-04-29', 'YYYY-MM-DD'), 13);
+INSERT INTO 討伐実績の書 VALUES (1018, 103, 7, 3, TO_DATE('2025-04-29', 'YYYY-MM-DD'), 13);
 
-INSERT INTO 討伐実績の書 VALUES
-(1019, 104, 2, 2, TO_DATE('2025-04-02', 'YYYY-MM-DD'), 7);
+INSERT INTO 討伐実績の書 VALUES (1019, 104, 2, 2, TO_DATE('2025-04-02', 'YYYY-MM-DD'), 7);
 
-INSERT INTO 討伐実績の書 VALUES
-(1020, 104, 5, 3, TO_DATE('2025-04-06', 'YYYY-MM-DD'), 10);
+INSERT INTO 討伐実績の書 VALUES (1020, 104, 5, 3, TO_DATE('2025-04-06', 'YYYY-MM-DD'), 10);
 
-INSERT INTO 討伐実績の書 VALUES
-(1021, 104, 4, 4, TO_DATE('2025-04-13', 'YYYY-MM-DD'), 9);
+INSERT INTO 討伐実績の書 VALUES (1021, 104, 4, 4, TO_DATE('2025-04-13', 'YYYY-MM-DD'), 9);
 
-INSERT INTO 討伐実績の書 VALUES
-(1022, 104, 3, 1, TO_DATE('2025-04-20', 'YYYY-MM-DD'), 11);
+INSERT INTO 討伐実績の書 VALUES (1022, 104, 3, 1, TO_DATE('2025-04-20', 'YYYY-MM-DD'), 11);
 
-INSERT INTO 討伐実績の書 VALUES
-(1023, 104, 1, 5, TO_DATE('2025-04-28', 'YYYY-MM-DD'), 12);
+INSERT INTO 討伐実績の書 VALUES (1023, 104, 1, 5, TO_DATE('2025-04-28', 'YYYY-MM-DD'), 12);
 
-INSERT INTO 討伐実績の書 VALUES
-(1024, 105, 3, 1, TO_DATE('2025-04-03', 'YYYY-MM-DD'), 14);
+INSERT INTO 討伐実績の書 VALUES (1024, 105, 3, 1, TO_DATE('2025-04-03', 'YYYY-MM-DD'), 14);
 
-INSERT INTO 討伐実績の書 VALUES
-(1025, 105, 5, 2, TO_DATE('2025-04-07', 'YYYY-MM-DD'), 6);
+INSERT INTO 討伐実績の書 VALUES (1025, 105, 5, 2, TO_DATE('2025-04-07', 'YYYY-MM-DD'), 6);
 
-INSERT INTO 討伐実績の書 VALUES
-(1026, 105, 6, 3, TO_DATE('2025-04-14', 'YYYY-MM-DD'), 7);
+INSERT INTO 討伐実績の書 VALUES (1026, 105, 6, 3, TO_DATE('2025-04-14', 'YYYY-MM-DD'), 7);
 
-INSERT INTO 討伐実績の書 VALUES
-(1027, 105, 2, 4, TO_DATE('2025-04-21', 'YYYY-MM-DD'), 10);
+INSERT INTO 討伐実績の書 VALUES (1027, 105, 2, 4, TO_DATE('2025-04-21', 'YYYY-MM-DD'), 10);
 
-INSERT INTO 討伐実績の書 VALUES
-(1028, 105, 4, 5, TO_DATE('2025-04-27', 'YYYY-MM-DD'), 13);
+INSERT INTO 討伐実績の書 VALUES (1028, 105, 4, 5, TO_DATE('2025-04-27', 'YYYY-MM-DD'), 13);
 
 INSERT INTO 討伐実績の書 VALUES (1029, 106, 8, 1, TO_DATE('2025-04-01', 'YYYY-MM-DD'), 4);
 
@@ -639,10 +592,6 @@ INSERT INTO 討伐実績の書 VALUES (1034, 107, 10, 2, TO_DATE('2025-04-02', '
 INSERT INTO 討伐実績の書 VALUES (1035, 107, 12, 3, TO_DATE('2025-04-09', 'YYYY-MM-DD'), 10);
 
 INSERT INTO 討伐実績の書 VALUES (1036, 107, 4, 1, TO_DATE('2025-04-15', 'YYYY-MM-DD'), 8);
-
-INSERT INTO 討伐実績の書 VALUES (1037, 107, 7, 4, TO_DATE('2025-04-21', 'YYYY-MM-DD'), 14);
-
-INSERT INTO 討伐実績の書 VALUES (1038, 107, 2, 5, TO_DATE('2025-04-27', 'YYYY-MM-DD'), 9);
 
 INSERT INTO 討伐実績の書 VALUES (1039, 108, 1, 3, TO_DATE('2025-04-03', 'YYYY-MM-DD'), 7);
 
@@ -714,15 +663,7 @@ INSERT INTO 討伐実績の書 VALUES (1072, 114, 2, 2, TO_DATE('2025-04-11', 'Y
 
 INSERT INTO 討伐実績の書 VALUES (1073, 114, 10, 4, TO_DATE('2025-04-17', 'YYYY-MM-DD'), 11);
 
-INSERT INTO 討伐実績の書 VALUES (1074, 114, 7, 5, TO_DATE('2025-04-22', 'YYYY-MM-DD'), 6);
-
-INSERT INTO 討伐実績の書 VALUES (1075, 114, 3, 3, TO_DATE('2025-04-26', 'YYYY-MM-DD'), 9);
-
 INSERT INTO 討伐実績の書 VALUES (1076, 114, 8, 2, TO_DATE('2025-04-29', 'YYYY-MM-DD'), 8);
-
-INSERT INTO 討伐実績の書 VALUES (1077, 115, 6, 1, TO_DATE('2025-04-07', 'YYYY-MM-DD'), 12);
-
-INSERT INTO 討伐実績の書 VALUES (1078, 115, 4, 3, TO_DATE('2025-04-12', 'YYYY-MM-DD'), 10);
 
 INSERT INTO 討伐実績の書 VALUES (1079, 115, 2, 4, TO_DATE('2025-04-18', 'YYYY-MM-DD'), 9);
 
@@ -730,61 +671,18 @@ INSERT INTO 討伐実績の書 VALUES (1080, 115, 11, 5, TO_DATE('2025-04-24', '
 
 INSERT INTO 討伐実績の書 VALUES (1081, 115, 1, 2, TO_DATE('2025-04-27', 'YYYY-MM-DD'), 6);
 
-INSERT INTO 討伐実績の書 VALUES (1082, 116, 5, 2, TO_DATE('2025-04-08', 'YYYY-MM-DD'), 8);
-
-INSERT INTO 討伐実績の書 VALUES (1083, 116, 8, 1, TO_DATE('2025-04-13', 'YYYY-MM-DD'), 12);
-
-INSERT INTO 討伐実績の書 VALUES (1084, 116, 6, 3, TO_DATE('2025-04-19', 'YYYY-MM-DD'), 9);
-
 INSERT INTO 討伐実績の書 VALUES (1085, 116, 9, 5, TO_DATE('2025-04-25', 'YYYY-MM-DD'), 11);
 
 INSERT INTO 討伐実績の書 VALUES (1086, 116, 12, 4, TO_DATE('2025-04-30', 'YYYY-MM-DD'), 10);
 
-INSERT INTO 討伐実績の書 VALUES (1087, 117, 7, 1, TO_DATE('2025-04-01', 'YYYY-MM-DD'), 6);
-
-INSERT INTO 討伐実績の書 VALUES (1088, 117, 2, 3, TO_DATE('2025-04-09', 'YYYY-MM-DD'), 10);
-
-INSERT INTO 討伐実績の書 VALUES (1089, 117, 4, 5, TO_DATE('2025-04-15', 'YYYY-MM-DD'), 8);
-
-INSERT INTO 討伐実績の書 VALUES (1090, 117, 10, 2, TO_DATE('2025-04-20', 'YYYY-MM-DD'), 7);
-
-INSERT INTO 討伐実績の書 VALUES (1091, 117, 3, 4, TO_DATE('2025-04-26', 'YYYY-MM-DD'), 9);
-
 INSERT INTO 討伐実績の書 VALUES (1092, 117, 13, 1, TO_DATE('2025-04-30', 'YYYY-MM-DD'), 12);
-
-INSERT INTO 討伐実績の書 VALUES (1093, 118, 6, 2, TO_DATE('2025-04-02', 'YYYY-MM-DD'), 11);
-
-INSERT INTO 討伐実績の書 VALUES (1094, 118, 1, 3, TO_DATE('2025-04-10', 'YYYY-MM-DD'), 9);
-
-INSERT INTO 討伐実績の書 VALUES (1095, 118, 9, 5, TO_DATE('2025-04-16', 'YYYY-MM-DD'), 10);
-
-INSERT INTO 討伐実績の書 VALUES (1096, 118, 11, 1, TO_DATE('2025-04-21', 'YYYY-MM-DD'), 7);
 
 INSERT INTO 討伐実績の書 VALUES (1097, 118, 8, 4, TO_DATE('2025-04-28', 'YYYY-MM-DD'), 6);
 
 INSERT INTO 討伐実績の書 VALUES (1098, 119, 4, 2, TO_DATE('2025-04-03', 'YYYY-MM-DD'), 7);
 
-INSERT INTO 討伐実績の書 VALUES (1099, 119, 2, 4, TO_DATE('2025-04-11', 'YYYY-MM-DD'), 13);
-
-INSERT INTO 討伐実績の書 VALUES (1100, 119, 5, 5, TO_DATE('2025-04-17', 'YYYY-MM-DD'), 9);
-
-INSERT INTO 討伐実績の書 VALUES (1101, 119, 10, 1, TO_DATE('2025-04-22', 'YYYY-MM-DD'), 10);
-
-INSERT INTO 討伐実績の書 VALUES (1102, 119, 3, 3, TO_DATE('2025-04-29', 'YYYY-MM-DD'), 8);
-
-INSERT INTO 討伐実績の書 VALUES (1103, 120, 7, 1, TO_DATE('2025-04-04', 'YYYY-MM-DD'), 5);
-
-INSERT INTO 討伐実績の書 VALUES (1104, 120, 6, 2, TO_DATE('2025-04-12', 'YYYY-MM-DD'), 11);
-
-INSERT INTO 討伐実績の書 VALUES (1105, 120, 8, 3, TO_DATE('2025-04-18', 'YYYY-MM-DD'), 9);
-
-INSERT INTO 討伐実績の書 VALUES (1106, 120, 9, 4, TO_DATE('2025-04-23', 'YYYY-MM-DD'), 10);
-
-INSERT INTO 討伐実績の書 VALUES (1107, 120, 12, 5, TO_DATE('2025-04-30', 'YYYY-MM-DD'), 13);
-
 commit;
 
--- 上級冒険者の書
 CREATE TABLE 上級冒険者の書 (
     冒険者ID NUMBER,       -- 冒険者の一意識別子
     名前 VARCHAR2(50) NOT NULL,        -- 冒険者の名前（NULL禁止）
@@ -793,5 +691,249 @@ CREATE TABLE 上級冒険者の書 (
     CONSTRAINT 上級冒険者の書PK PRIMARY KEY (冒険者ID)
 );
 
+CREATE TABLE 技の書 (
+  技ID      INTEGER,
+  技名      VARCHAR2(100),
+  効果      VARCHAR2(200),
+  CONSTRAINT 技の書PK PRIMARY KEY (技ID)
+);
+
+INSERT INTO 技の書 VALUES (1, 'ファイアボルト', '小さな火球で敵単体を攻撃');
+
+INSERT INTO 技の書 VALUES (2, 'アイスニードル', '氷の槍で敵単体に貫通ダメージ');
+
+INSERT INTO 技の書 VALUES (3, 'ライトニングエッジ', '電撃をまとって敵全体に攻撃');
+
+INSERT INTO 技の書 VALUES (4, 'ヒール', '味方一人のHPを中程度回復');
+
+INSERT INTO 技の書 VALUES (5, 'ストーンスキン', '味方全体の防御力を上昇');
+
+INSERT INTO 技の書 VALUES (6, 'ウィンドスラッシュ', '風の刃で複数の敵を攻撃');
+
+INSERT INTO 技の書 VALUES (7, 'ポイズンミスト', '敵全体に毒を付与');
+
+INSERT INTO 技の書 VALUES (8, 'シャドウステップ', '回避率を一時的に上昇');
+
+INSERT INTO 技の書 VALUES (9, 'エクスプロージョン', '爆発魔法で大ダメージ');
+
+INSERT INTO 技の書 VALUES (10, 'リザレクション', '戦闘不能の仲間を蘇生');
+
+INSERT INTO 技の書 VALUES (11, 'フレイムシールド', '炎の盾でダメージ軽減');
+
+INSERT INTO 技の書 VALUES (12, 'ホーリーライト', 'アンデッド系に特効ダメージ');
+
+INSERT INTO 技の書 VALUES (13, 'アクアブレード', '水の刃で連続攻撃');
+
+INSERT INTO 技の書 VALUES (14, 'マジックバリア', '魔法ダメージを軽減');
+
+INSERT INTO 技の書 VALUES (15, 'サンダーストーム', '雷の嵐で敵全体に大ダメージ');
+
+INSERT INTO 技の書 VALUES (16, 'チャージスラッシュ', '溜め斬りで攻撃力上昇');
+
+INSERT INTO 技の書 VALUES (17, 'ミラージュ', '分身して攻撃を回避');
+
+INSERT INTO 技の書 VALUES (18, 'ブラッドドレイン', '与えたダメージの一部を吸収');
+
+INSERT INTO 技の書 VALUES (19, 'スリープクラウド', '敵全体に睡眠効果');
+
+INSERT INTO 技の書 VALUES (20, 'フォースブレイク', '物理耐性を一時的に低下');
+
+CREATE TABLE 冒険者技の書 (
+    冒険者ID      NUMBER,
+    技ID          NUMBER,
+    習得日        DATE,
+    CONSTRAINT 冒険者技の書PK PRIMARY KEY (冒険者ID, 技ID),
+    CONSTRAINT 冒険者技の書FK1 FOREIGN KEY (冒険者ID) REFERENCES 冒険者の書(冒険者ID),
+    CONSTRAINT 冒険者技の書FK2 FOREIGN KEY (技ID)     REFERENCES 技の書(技ID)
+);
+
+INSERT INTO 冒険者技の書 VALUES (101, 1, DATE '2014-07-09');
+
+INSERT INTO 冒険者技の書 VALUES (101, 2, DATE '2015-01-05');
+
+INSERT INTO 冒険者技の書 VALUES (101, 3, DATE '2015-07-04');
+
+INSERT INTO 冒険者技の書 VALUES (101, 4, DATE '2016-01-01');
+
+INSERT INTO 冒険者技の書 VALUES (101, 5, DATE '2016-06-29');
+
+INSERT INTO 冒険者技の書 VALUES (101, 6, DATE '2016-12-26');
+
+INSERT INTO 冒険者技の書 VALUES (102, 2, DATE '2014-12-12');
+
+INSERT INTO 冒険者技の書 VALUES (102, 4, DATE '2015-06-10');
+
+INSERT INTO 冒険者技の書 VALUES (102, 5, DATE '2015-12-07');
+
+INSERT INTO 冒険者技の書 VALUES (102, 6, DATE '2016-06-04');
+
+INSERT INTO 冒険者技の書 VALUES (102, 7, DATE '2016-12-01');
+
+INSERT INTO 冒険者技の書 VALUES (102, 8, DATE '2017-05-30');
+
+INSERT INTO 冒険者技の書 VALUES (103, 3, DATE '2015-09-16');
+
+INSERT INTO 冒険者技の書 VALUES (103, 5, DATE '2016-03-14');
+
+INSERT INTO 冒険者技の書 VALUES (103, 6, DATE '2016-09-10');
+
+INSERT INTO 冒険者技の書 VALUES (103, 7, DATE '2017-03-09');
+
+INSERT INTO 冒険者技の書 VALUES (103, 8, DATE '2017-09-05');
+
+INSERT INTO 冒険者技の書 VALUES (103, 9, DATE '2018-03-04');
+
+INSERT INTO 冒険者技の書 VALUES (104, 1, DATE '2016-02-28');
+
+INSERT INTO 冒険者技の書 VALUES (104, 4, DATE '2016-08-26');
+
+INSERT INTO 冒険者技の書 VALUES (104, 7, DATE '2017-02-22');
+
+INSERT INTO 冒険者技の書 VALUES (104, 9, DATE '2017-08-21');
+
+INSERT INTO 冒険者技の書 VALUES (104, 11, DATE '2018-02-17');
+
+INSERT INTO 冒険者技の書 VALUES (105, 2, DATE '2016-08-08');
+
+INSERT INTO 冒険者技の書 VALUES (105, 6, DATE '2017-02-04');
+
+INSERT INTO 冒険者技の書 VALUES (105, 8, DATE '2017-08-03');
+
+INSERT INTO 冒険者技の書 VALUES (105, 10, DATE '2018-01-30');
+
+INSERT INTO 冒険者技の書 VALUES (105, 13, DATE '2018-07-29');
+
+INSERT INTO 冒険者技の書 VALUES (106, 3, DATE '2017-01-11');
+
+INSERT INTO 冒険者技の書 VALUES (106, 4, DATE '2017-07-10');
+
+INSERT INTO 冒険者技の書 VALUES (106, 5, DATE '2018-01-06');
+
+INSERT INTO 冒険者技の書 VALUES (106, 6, DATE '2018-07-05');
+
+INSERT INTO 冒険者技の書 VALUES (107, 1, DATE '2017-07-19');
+
+INSERT INTO 冒険者技の書 VALUES (107, 2, DATE '2018-01-15');
+
+INSERT INTO 冒険者技の書 VALUES (107, 4, DATE '2018-07-14');
+
+INSERT INTO 冒険者技の書 VALUES (107, 5, DATE '2019-01-10');
+
+INSERT INTO 冒険者技の書 VALUES (108, 2, DATE '2017-12-02');
+
+INSERT INTO 冒険者技の書 VALUES (108, 5, DATE '2018-05-31');
+
+INSERT INTO 冒険者技の書 VALUES (108, 7, DATE '2018-11-27');
+
+INSERT INTO 冒険者技の書 VALUES (109, 1, DATE '2018-08-09');
+
+INSERT INTO 冒険者技の書 VALUES (109, 3, DATE '2019-02-05');
+
+INSERT INTO 冒険者技の書 VALUES (109, 6, DATE '2019-08-04');
+
+INSERT INTO 冒険者技の書 VALUES (110, 2, DATE '2019-02-11');
+
+INSERT INTO 冒険者技の書 VALUES (110, 3, DATE '2019-08-10');
+
+INSERT INTO 冒険者技の書 VALUES (110, 4, DATE '2020-02-06');
+
+INSERT INTO 冒険者技の書 VALUES (111, 3, DATE '2019-09-21');
+
+INSERT INTO 冒険者技の書 VALUES (111, 5, DATE '2020-03-19');
+
+INSERT INTO 冒険者技の書 VALUES (112, 2, DATE '2020-03-03');
+
+INSERT INTO 冒険者技の書 VALUES (112, 6, DATE '2020-08-30');
+
+INSERT INTO 冒険者技の書 VALUES (113, 1, DATE '2020-07-13');
+
+INSERT INTO 冒険者技の書 VALUES (113, 7, DATE '2021-01-09');
+
+INSERT INTO 冒険者技の書 VALUES (114, 4, DATE '2020-12-16');
+
+INSERT INTO 冒険者技の書 VALUES (114, 5, DATE '2021-06-14');
+
+INSERT INTO 冒険者技の書 VALUES (115, 6, DATE '2021-08-04');
+
+INSERT INTO 冒険者技の書 VALUES (115, 7, DATE '2022-01-31');
+
+INSERT INTO 冒険者技の書 VALUES (116, 3, DATE '2022-01-11');
+
+INSERT INTO 冒険者技の書 VALUES (117, 2, DATE '2022-10-07');
+
+INSERT INTO 冒険者技の書 VALUES (118, 1, DATE '2023-03-19');
+
+INSERT INTO 冒険者技の書 VALUES (119, 5, DATE '2023-11-11');
+
+INSERT INTO 冒険者技の書 VALUES (120, 4, DATE '2024-07-28');
+
+CREATE TABLE 魔物の書_更新前 (
+    魔物ID NUMBER,
+    防御力 NUMBER,
+    魔物タイプID NUMBER,
+    CONSTRAINT 魔物の書_更新前PK PRIMARY KEY (魔物ID)
+);
+
+CREATE TABLE 口座の書 (
+    口座ID      NUMBER(10)      NOT NULL, -- 口座を一意に識別するID（主キー）
+    冒険者ID    NUMBER(10)      NOT NULL, -- 口座を所有する冒険者のID（外部キー）
+    残高        NUMBER(15, 2)   DEFAULT 0 NOT NULL, -- 現在の所持ゴールド残高（小数点以下2桁まで）
+    CONSTRAINT 口座の書PK PRIMARY KEY (口座ID),
+    CONSTRAINT 口座の書FK1 FOREIGN KEY (冒険者ID) REFERENCES 冒険者の書(冒険者ID)
+);
+
+CREATE TABLE 口座取引の書 (
+    取引ID      NUMBER(10)      NOT NULL, -- 取引を一意に識別するID（主キー）
+    口座ID      NUMBER(10)      NOT NULL, -- 取引が行われた口座のID（外部キー）
+    取引日時    TIMESTAMP       DEFAULT SYSTIMESTAMP NOT NULL, -- 取引が行われた日時
+    ゴールド    NUMBER(15, 2)   NOT NULL, -- 取引金額（入金は正の値、出金は負の値で表現することが一般的）
+    摘要        VARCHAR2(255)   NULL,     -- 取引内容の概要
+    CONSTRAINT 口座取引の書PK PRIMARY KEY (取引ID),
+    CONSTRAINT 口座取引の書FK1 FOREIGN KEY (口座ID) REFERENCES 口座の書(口座ID)
+);
+
+INSERT INTO 口座の書 (口座ID, 冒険者ID, 残高) VALUES (1, 101, 35000);
+
+INSERT INTO 口座の書 (口座ID, 冒険者ID, 残高) VALUES (2, 102, 33000);
+
+INSERT INTO 口座の書 (口座ID, 冒険者ID, 残高) VALUES (3, 103, 32000);
+
+INSERT INTO 口座の書 (口座ID, 冒険者ID, 残高) VALUES (4, 104, 30000);
+
+INSERT INTO 口座の書 (口座ID, 冒険者ID, 残高) VALUES (5, 105, 29000);
+
+INSERT INTO 口座の書 (口座ID, 冒険者ID, 残高) VALUES (6, 106, 27000);
+
+INSERT INTO 口座の書 (口座ID, 冒険者ID, 残高) VALUES (7, 107, 25000);
+
+INSERT INTO 口座の書 (口座ID, 冒険者ID, 残高) VALUES (8, 108, 22000);
+
+INSERT INTO 口座の書 (口座ID, 冒険者ID, 残高) VALUES (9, 109, 21000);
+
+INSERT INTO 口座の書 (口座ID, 冒険者ID, 残高) VALUES (10, 110, 20000);
+
+INSERT INTO 口座の書 (口座ID, 冒険者ID, 残高) VALUES (11, 111, 18000);
+
+INSERT INTO 口座の書 (口座ID, 冒険者ID, 残高) VALUES (12, 112, 17000);
+
+INSERT INTO 口座の書 (口座ID, 冒険者ID, 残高) VALUES (13, 113, 15000);
+
+INSERT INTO 口座の書 (口座ID, 冒険者ID, 残高) VALUES (14, 114, 13000);
+
+INSERT INTO 口座の書 (口座ID, 冒険者ID, 残高) VALUES (15, 115, 12000);
+
+INSERT INTO 口座の書 (口座ID, 冒険者ID, 残高) VALUES (16, 116, 11000);
+
+INSERT INTO 口座の書 (口座ID, 冒険者ID, 残高) VALUES (17, 117, 10000);
+
+INSERT INTO 口座の書 (口座ID, 冒険者ID, 残高) VALUES (18, 118, 9000);
+
+INSERT INTO 口座の書 (口座ID, 冒険者ID, 残高) VALUES (19, 119, 8000);
+
+INSERT INTO 口座の書 (口座ID, 冒険者ID, 残高) VALUES (20, 120, 7000);
+
 ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD';
+
+ALTER SESSION SET NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS'
+
 
